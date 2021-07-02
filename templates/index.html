@@ -49,6 +49,45 @@
       }
     };
     
+    function post_img_and_display_pred() {
+      const formData = new FormData();
+      const fileField = document.querySelector('input[type="file"]');
+      
+      formData.append("file", fileField.files[0]);
+      
+      fetch("/", {
+        method: 'POST',
+        body: formData
+      })
+      .then((response) => response.json())
+      .then((result) => {
+        if (result.success) {
+          draw_bbox(result.data);
+        } else {
+          alert(result.data);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        alert("[Error]: Sorry, something went wrong!");
+      });
+    }
+    
+    function draw_bbox(bbox) {
+      var c = document.getElementById("img panel")
+      var ctx = c.getContext("2d");
+      ctx.lineWidth = ".5";
+      ctx.strokeStyle = "red";
+      for (const box of  bbox) {
+        ctx.beginPath();
+        ctx.moveTo(box[0], box[1]);
+        ctx.lineTo(box[2], box[3]);
+        ctx.lineTo(box[4], box[5]);
+        ctx.lineTo(box[6], box[7]);
+        ctx.closePath();
+        ctx.stroke();
+      }
+    }
   </script>
   <title>Han Nom Character Dectector</title>
   </head>
@@ -56,7 +95,7 @@
     <div class='buttons'>
       <form method="post" enctype="multipart/form-data">
         <input class="btn btn-secondary" type="file" name="file" id="myImage" onchange="displayImg()" accept="image/*">
-        <input class="btn btn-secondary" type="submit" value="Upload">
+        <button type="button" class="btn btn-secondary" onclick="post_img_and_display_pred()">Upload</button>
       </form>
     </div>
     <div class='canvas'>

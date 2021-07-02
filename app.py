@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect
 from message import *
 import os
+import pandas as pd
+import numpy as np  
 
 app = Flask(__name__)
 app.secret_key = os.urandom(12).hex()
@@ -17,14 +19,14 @@ def get_prediction():
     return render_template('index.html')
   else:
     if 'file' not in request.files: 
-      print('No file part')
-      return render_template('index.html')
+      return error('[Error]: No file part')
     file = request.files['file']
     if file and file.filename != '' and allowed_file(file.filename):
       img_bytes = file.read()
-      return success(0)
-    print('No selected file')
-    return error('[Error]: No attached image or unsupported image extension!')
+      ann = pd.read_csv('test/LienPhai-2484.txt',header=None).to_numpy().astype(np.float32)
+      ann = (ann*500/3563).astype(np.int16)[..., :8].tolist()
+      return success(ann)
+    return error('[Error]: Unsupported file extension!')
 
 if __name__ == '__main__':
    app.run(debug=True)
