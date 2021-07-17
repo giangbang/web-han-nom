@@ -146,7 +146,7 @@ class Demo:
                 cv2.imwrite(os.path.join(self.args['result_dir'], image_path.split('/')[-1].split('.')[0]+'.jpg'), vis_image)
             
             bbox, thres = output
-            return bbox[thres>=self.args['box_thresh']]
+            return np.array(bbox)[(np.array(thres)>self.args['box_thresh'])]
 
 if __name__ == '__main__':
     main()
